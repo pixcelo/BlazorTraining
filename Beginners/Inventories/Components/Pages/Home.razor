@@ -1,7 +1,27 @@
 ﻿@page "/"
+@using Inventories.Models
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<table>
+    <tbody>
+        @foreach (var stockItem in this.stockItems)
+        {
+            <tr @key="stockItem.Id"> <!-- ＠keyはBlazorエンジン側に列挙される行を一意に識別するための値 -->
+                <td>@stockItem.Name</td>
+                <td>@stockItem.LotNumber</td>
+                <td>@stockItem.Quantity</td>
+                <td>@stockItem.ArrivalDate.ToShortDateString()</td>
+            </tr>
+        }        
+    </tbody>
+</table>
 
-Welcome to your new app.
+@code {
+    private List<StockItems> stockItems = new List<StockItems>()
+    {
+        new StockItems { Id = 1, Name = "Item1", LotNumber = "Lot1", Quantity = 5, ArrivalDate = new DateTime(2024, 10, 14), },
+        new StockItems { Id = 2, Name = "Item2", LotNumber = "Lot2", Quantity = 10, ArrivalDate = new DateTime(2024, 10, 15), },
+        new StockItems { Id = 3, Name = "Item3", LotNumber = "Lot3", Quantity = 15, ArrivalDate = new DateTime(2024, 10, 16), },
+    };   
+}
