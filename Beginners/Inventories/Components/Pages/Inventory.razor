@@ -7,7 +7,7 @@
 
 <h3>Inventories</h3>
 
-<table>
+<table class="table">
     <tbody>
         @foreach (var stockItem in this.stockItems)
         {
@@ -24,18 +24,18 @@
 
 <div>
     <div>
-        品名 <input type="text" @bind="newStockItem.Name" />
+        品名 <input class="form-control" type="text" @bind="newStockItem.Name" />
     </div>
     <div>
-        ロット番号 <input type="text" @bind="newStockItem.LotNumber" />
+        ロット番号 <input class="form-control" type="text" @bind="newStockItem.LotNumber" />
     </div>
     <div>
-        数量 <input type="number" @bind="newStockItem.Quantity" />
+        数量 <input class="form-control" type="number" @bind="newStockItem.Quantity" />
     </div>
     <div>
-        入庫日 <input type="date" @bind="newStockItem.ArrivalDate" />
+        入庫日 <input class="form-control" type="date" @bind="newStockItem.ArrivalDate" />
     </div>
-    <button @onclick="OnOkAsync">追加</button>
+    <button class="btn btn-primary" @onclick="OnOkAsync">追加</button>
 </div>
 
 @code {
