@@ -1,10 +1,18 @@
 using Inventories.Components;
+using Inventories.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContextFactory<InventoryDbContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("InventoryDb");
+    options.UseSqlServer(connectionString);
+});
 
 var app = builder.Build();
 
