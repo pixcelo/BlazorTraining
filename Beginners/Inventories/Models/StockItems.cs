@@ -9,10 +9,10 @@ namespace Inventories.Models
     {
         public int Id { get; set; }
 
-        [Required, StringLength(50)]
+        [Display(Name = "品名"), Required(ErrorMessage ="{0} を入力してください。"), StringLength(50, ErrorMessage ="{0} は最大 {1} 文字までです。")]
         public string? Name { get; set; } = "";
 
-        [Required, StringLength(50)]
+        [Display(Name = "ロット番号"), Required(ErrorMessage = "{0} を入力してください。"), StringLength(50, ErrorMessage = "{0} は最大 {1} 文字までです。")]
         public string? LotNumber { get; set; } = "";
 
         public int Quantity { get; set; }

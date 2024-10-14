@@ -22,7 +22,8 @@
     </tbody>
 </table>
 
-<div>
+<EditForm Model="this.newStockItem" OnValidSubmit="OnOkAsync">
+    <DataAnnotationsValidator />
     <div>
         品名 <input class="form-control" type="text" @bind="newStockItem.Name" />
     </div>
@@ -35,8 +36,10 @@
     <div>
         入庫日 <input class="form-control" type="date" @bind="newStockItem.ArrivalDate" />
     </div>
-    <button class="btn btn-primary" @onclick="OnOkAsync">追加</button>
-</div>
+
+    <ValidationSummary />
+    <button class="btn btn-primary">追加</button>
+</EditForm>
 
 @code {
     private List<StockItems> stockItems = new List<StockItems>();
