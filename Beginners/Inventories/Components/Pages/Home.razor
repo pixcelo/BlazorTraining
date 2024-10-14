@@ -1,32 +1,8 @@
 ﻿@page "/"
-@using Inventories.Data
-@using Inventories.Models
-@using Microsoft.EntityFrameworkCore
-@inject IDbContextFactory<InventoryDbContext> DbContextFactory
+
 
 <PageTitle>Home</PageTitle>
 
-<table>
-    <tbody>
-        @foreach (var stockItem in this.stockItems)
-        {
-            <tr @key="stockItem.Id"> <!-- ＠keyはBlazorエンジン側に列挙される行を一意に識別するための値 -->
-                <td>@stockItem.Name</td>
-                <td>@stockItem.LotNumber</td>
-                <td>@stockItem.Quantity</td>
-                <td>@stockItem.ArrivalDate.ToShortDateString()</td>
-            </tr>
-        }        
-    </tbody>
-</table>
-
 @code {
-    private List<StockItems> stockItems = new List<StockItems>();
 
-    // OnInitializedAsyncをオーバーライドして、ページが初期化されるときにDIしたコンテキストを使ってデータを取得
-    protected override async Task OnInitializedAsync()
-    {
-        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-        this.stockItems = await dbContext.StockItems.ToListAsync();
-    }
 }

@@ -1,0 +1,73 @@
+﻿@page "/inventory"
+@rendermode InteractiveServer
+@using Inventories.Data
+@using Inventories.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<InventoryDbContext> DbContextFactory
+
+<h3>Inventories</h3>
+
+<table>
+    <tbody>
+        @foreach (var stockItem in this.stockItems)
+        {
+            <tr @key="stockItem.Id">
+                <!-- ＠keyはBlazorエンジン側に列挙される行を一意に識別するための値 -->
+                <td>@stockItem.Name</td>
+                <td>@stockItem.LotNumber</td>
+                <td>@stockItem.Quantity</td>
+                <td>@stockItem.ArrivalDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <div>
+        品名 <input type="text" @bind="newStockItem.Name" />
+    </div>
+    <div>
+        ロット番号 <input type="text" @bind="newStockItem.LotNumber" />
+    </div>
+    <div>
+        数量 <input type="number" @bind="newStockItem.Quantity" />
+    </div>
+    <div>
+        入庫日 <input type="date" @bind="newStockItem.ArrivalDate" />
+    </div>
+    <button @onclick="OnOkAsync">追加</button>
+</div>
+
+@code {
+    private List<StockItems> stockItems = new List<StockItems>();
+
+    private StockItems newStockItem = new StockItems();
+
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
+    /// <returns></returns>
+    /// <remarks>
+    /// OnInitializedAsyncをオーバーライドして、ページが初期化されるときにDIしたコンテキストを使ってデータを取得
+    /// </remarks>
+    protected override async Task OnInitializedAsync()
+    {
+        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
+        this.stockItems = await dbContext.StockItems.ToListAsync();
+    }
+
+    /// <summary>
+    /// 在庫を追加する
+    /// </summary>
+    /// <returns></returns>
+    private async Task OnOkAsync()
+    {
+        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
+        await dbContext.StockItems.AddAsync(this.newStockItem);
+        await dbContext.SaveChangesAsync();
+
+        this.stockItems.Add(this.newStockItem);
+        this.newStockItem = new StockItems();
+    }
+}
+
