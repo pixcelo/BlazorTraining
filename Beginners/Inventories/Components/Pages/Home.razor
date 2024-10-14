@@ -1,5 +1,8 @@
 ﻿@page "/"
+@using Inventories.Data
 @using Inventories.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<InventoryDbContext> DbContextFactory
 
 <PageTitle>Home</PageTitle>
 
@@ -18,10 +21,12 @@
 </table>
 
 @code {
-    private List<StockItems> stockItems = new List<StockItems>()
+    private List<StockItems> stockItems = new List<StockItems>();
+
+    // OnInitializedAsyncをオーバーライドして、ページが初期化されるときにDIしたコンテキストを使ってデータを取得
+    protected override async Task OnInitializedAsync()
     {
-        new StockItems { Id = 1, Name = "Item1", LotNumber = "Lot1", Quantity = 5, ArrivalDate = new DateTime(2024, 10, 14), },
-        new StockItems { Id = 2, Name = "Item2", LotNumber = "Lot2", Quantity = 10, ArrivalDate = new DateTime(2024, 10, 15), },
-        new StockItems { Id = 3, Name = "Item3", LotNumber = "Lot3", Quantity = 15, ArrivalDate = new DateTime(2024, 10, 16), },
-    };   
+        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
+        this.stockItems = await dbContext.StockItems.ToListAsync();
+    }
 }
