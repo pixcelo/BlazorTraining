@@ -4,6 +4,7 @@
 @using Inventories.Models
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<InventoryDbContext> DbContextFactory
+@inject IJSRuntime JSRuntime
 
 <h3>在庫品　一覧</h3>
 
@@ -19,6 +20,7 @@
                 <td>@stockItem.ArrivalDate.ToShortDateString()</td>
                 <td>
                     <a href="./inventory/edit/@stockItem.Id">編集</a>
+                    <button class="btn btn-danger" @onclick="@(() => OnDeleteAsync(stockItem))">削除</button>
                 </td>
             </tr>
         }
@@ -44,4 +46,19 @@
         await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
         this.stockItems = await dbContext.StockItems.ToListAsync();
     }    
+
+    /// <summary>
+    /// 在庫品を削除する（物理削除）
+    /// </summary>
+    /// <param name="stockItem"></param>
+    private async Task OnDeleteAsync(StockItems stockItem)
+    {
+        var yes = await this.JSRuntime.InvokeAsync<bool>("confirm", $"{stockItem.Name}を削除しますか？");
+        if (!yes) return;
+
+        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
+        dbContext.Remove(stockItem);
+        await dbContext.SaveChangesAsync();
+        this.stockItems.Remove(stockItem);
+    }
 }
