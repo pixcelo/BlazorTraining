@@ -5,7 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<InventoryDbContext> DbContextFactory
 
-<h3>Inventories</h3>
+<h3>在庫品　一覧</h3>
 
 <table class="table">
     <tbody>
@@ -22,29 +22,12 @@
     </tbody>
 </table>
 
-<EditForm Model="this.newStockItem" OnValidSubmit="OnOkAsync">
-    <DataAnnotationsValidator />
-    <div>
-        品名 <input class="form-control" type="text" @bind="newStockItem.Name" />
-    </div>
-    <div>
-        ロット番号 <input class="form-control" type="text" @bind="newStockItem.LotNumber" />
-    </div>
-    <div>
-        数量 <input class="form-control" type="number" @bind="newStockItem.Quantity" />
-    </div>
-    <div>
-        入庫日 <input class="form-control" type="date" @bind="newStockItem.ArrivalDate" />
-    </div>
-
-    <ValidationSummary />
-    <button class="btn btn-primary">追加</button>
-</EditForm>
+<div>
+    <a href="./inventory/add">在庫品の追加</a>
+</div>
 
 @code {
     private List<StockItems> stockItems = new List<StockItems>();
-
-    private StockItems newStockItem = new StockItems();
 
     /// <summary>
     /// 初期化処理
@@ -57,20 +40,5 @@
     {
         await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
         this.stockItems = await dbContext.StockItems.ToListAsync();
-    }
-
-    /// <summary>
-    /// 在庫を追加する
-    /// </summary>
-    /// <returns></returns>
-    private async Task OnOkAsync()
-    {
-        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-        await dbContext.StockItems.AddAsync(this.newStockItem);
-        await dbContext.SaveChangesAsync();
-
-        this.stockItems.Add(this.newStockItem);
-        this.newStockItem = new StockItems();
-    }
+    }    
 }
-
