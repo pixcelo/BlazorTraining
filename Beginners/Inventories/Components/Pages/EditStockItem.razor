@@ -1,0 +1,53 @@
+﻿@page "/inventory/edit/{Id:int}"
+@rendermode InteractiveServer
+@using Inventories.Data
+@using Inventories.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<InventoryDbContext> DbContextFactory
+@inject NavigationManager NavigationManager
+
+<h3>在庫品　編集</h3>
+
+<!-- 非同期で取得するため、StockItemのNullチェックが完了してからレンダリングする -->
+@if (this.stockItem is not null)
+{
+    <!-- <StockItemForm StockItem= のStockItemは親コンポーネントにPublicで定義したもの -->
+    <StockItemForm StockItem="@this.stockItem" OnOk="OnOkAsync" OnCancel="OnCancel" />
+}
+
+@code {
+    /// <summary>
+    /// @page "/inventory/edit/{Id}" で指定されたIdを対応付ける
+    /// </summary>
+    [Parameter]
+    public int Id { get; set; }
+
+    /// <summary>
+    /// 非同期で処理を行うためNullable型を使用しておく
+    /// </summary>
+    private StockItems? stockItem;
+
+    /// <summary>
+    /// OnInitializedAsyncはコンポーネントが初期化されるタイミングで呼び出される
+    /// </summary>
+    /// <returns></returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
+        this.stockItem = await dbContext.StockItems.FindAsync(this.Id);
+    }
+
+    private async Task OnOkAsync(StockItems newStockItem)
+    {
+        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
+        dbContext.StockItems.Update(newStockItem);
+        await dbContext.SaveChangesAsync();
+
+        this.NavigationManager.NavigateTo("./inventory");
+    }
+
+    private void OnCancel()
+    {
+        this.NavigationManager.NavigateTo("./inventory");
+    }
+}

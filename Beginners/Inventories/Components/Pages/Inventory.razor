@@ -17,6 +17,9 @@
                 <td>@stockItem.LotNumber</td>
                 <td>@stockItem.Quantity</td>
                 <td>@stockItem.ArrivalDate.ToShortDateString()</td>
+                <td>
+                    <a href="./inventory/edit/@stockItem.Id">編集</a>
+                </td>
             </tr>
         }
     </tbody>
