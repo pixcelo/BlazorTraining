@@ -1,0 +1,45 @@
+﻿@using Inventories.Components.Shared
+@using Inventories.Models
+
+<EditForm Model="this.newStockItem" OnValidSubmit="OnOkAsync">
+    <DataAnnotationsValidator />
+    <div>
+        品名 <input class="form-control" type="text" @bind="newStockItem.Name" />
+    </div>
+    <div>
+        ロット番号 <input class="form-control" type="text" @bind="newStockItem.LotNumber" />
+    </div>
+    <div>
+        数量 <input class="form-control" type="number" @bind="newStockItem.Quantity" />
+    </div>
+    <div>
+        入庫日 <input class="form-control" type="date" @bind="newStockItem.ArrivalDate" />
+    </div>
+
+    <ValidationSummary />
+    <button class="btn btn-primary">追加</button>
+    <button class="btn btn-primary" @onclick="OnCancelAsync">キャンセル</button>
+</EditForm>
+
+@code {
+    private StockItems newStockItem = new StockItems();
+
+    // このフォームコンポーネントは追加・編集で共通で使用する
+    // ここに固有の処理を書くのではなく、親にイベント情報を伝達させる
+    [Parameter]
+    public EventCallback<StockItems> OnOk { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private async void OnOkAsync()
+    {
+        // 親コンポーネント側のメソッドを呼び出す
+        await this.OnOk.InvokeAsync(this.newStockItem);        
+    }
+
+    private async void OnCancelAsync()
+    {
+        await this.OnCancel.InvokeAsync();
+    }
+}

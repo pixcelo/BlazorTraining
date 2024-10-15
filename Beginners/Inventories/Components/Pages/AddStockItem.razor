@@ -8,37 +8,18 @@
 
 <h3>在庫品　追加</h3>
 
-<EditForm Model="this.newStockItem" OnValidSubmit="OnOkAsync">
-    <DataAnnotationsValidator />
-    <div>
-        品名 <input class="form-control" type="text" @bind="newStockItem.Name" />
-    </div>
-    <div>
-        ロット番号 <input class="form-control" type="text" @bind="newStockItem.LotNumber" />
-    </div>
-    <div>
-        数量 <input class="form-control" type="number" @bind="newStockItem.Quantity" />
-    </div>
-    <div>
-        入庫日 <input class="form-control" type="date" @bind="newStockItem.ArrivalDate" />
-    </div>
-
-    <ValidationSummary />
-    <button class="btn btn-primary">追加</button>
-    <button class="btn btn-primary" @onclick="OnCancel">キャンセル</button>
-</EditForm>
+<!-- 子コンポーネントからイベントの発火を受け取り、親コンポーネントのメソッドを実行する -->
+<StockItemForm OnOk="OnOkAsync" OnCancel="OnCancel" />
 
 @code {
-    private StockItems newStockItem = new StockItems();
-
     /// <summary>
     /// 在庫を追加する
     /// </summary>
     /// <returns></returns>
-    private async Task OnOkAsync()
+    private async Task OnOkAsync(StockItems newStockItem)
     {
         await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-        await dbContext.StockItems.AddAsync(this.newStockItem);
+        await dbContext.StockItems.AddAsync(newStockItem);
         await dbContext.SaveChangesAsync();
 
         /// 在庫を追加した後、在庫一覧画面に戻る処理は、NavigationManagerをDIして実現する
@@ -47,7 +28,7 @@
 
     /// <summary>
     /// キャンセル（一覧画面に戻る）
-    /// </summary>    
+    /// </summary>
     private void OnCancel()
     {
         this.NavigationManager.NavigateTo("./inventory");
