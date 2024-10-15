@@ -5,6 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<InventoryDbContext> DbContextFactory
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <h3>在庫品　編集</h3>
 
@@ -39,11 +40,27 @@
 
     private async Task OnOkAsync(StockItems newStockItem)
     {
-        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-        dbContext.StockItems.Update(newStockItem);
-        await dbContext.SaveChangesAsync();
+        try
+        {
+            await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
+            dbContext.StockItems.Update(newStockItem);
+            await dbContext.SaveChangesAsync();
 
-        this.NavigationManager.NavigateTo("./inventory");
+            this.NavigationManager.NavigateTo("./inventory");
+        }    
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // 同じ在庫情報が同時に変更された場合、rowVersion差異による例外が発生
+            // Console.WriteLine(ex.Message);
+
+            // @inject IJSRuntime JSRuntime でDIしたインターフェイスからJavaScriptを実行するパターン
+            // await this.JSRuntime.InvokeVoidAsync(
+            //     "alert", "他のユーザーによって在庫情報が変更されました。キャンセルしてやり直してください。");
+
+            // wwwrootに定義した静的ファイルからJavaScriptの関数を呼び出して実行するパターン
+            await using var module = await this.JSRuntime.InvokeAsync<IJSObjectReference>("import", "./helper.js");
+            await module.InvokeVoidAsync("showMessage", "他のユーザーによって在庫情報が変更されました。キャンセルしてやり直してください。");
+        }
     }
 
     private void OnCancel()
