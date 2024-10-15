@@ -1,28 +1,29 @@
 ﻿@using Inventories.Components.Shared
 @using Inventories.Models
 
-<EditForm Model="this.newStockItem" OnValidSubmit="OnOkAsync">
+<EditForm Model="this.stockItem" OnValidSubmit="OnOkAsync">
     <DataAnnotationsValidator />
     <div>
-        品名 <input class="form-control" type="text" @bind="newStockItem.Name" />
+        品名 <input class="form-control" type="text" @bind="stockItem.Name" />
     </div>
     <div>
-        ロット番号 <input class="form-control" type="text" @bind="newStockItem.LotNumber" />
+        ロット番号 <input class="form-control" type="text" @bind="stockItem.LotNumber" />
     </div>
     <div>
-        数量 <input class="form-control" type="number" @bind="newStockItem.Quantity" />
+        数量 <input class="form-control" type="number" @bind="stockItem.Quantity" />
     </div>
     <div>
-        入庫日 <input class="form-control" type="date" @bind="newStockItem.ArrivalDate" />
+        入庫日 <input class="form-control" type="date" @bind="stockItem.ArrivalDate" />
     </div>
 
     <ValidationSummary />
-    <button class="btn btn-primary">追加</button>
+    <button class="btn btn-primary">更新</button>
     <button class="btn btn-primary" @onclick="OnCancelAsync">キャンセル</button>
 </EditForm>
 
 @code {
-    private StockItems newStockItem = new StockItems();
+    [Parameter]
+    public StockItems stockItem { get; set; } = new StockItems();
 
     // このフォームコンポーネントは追加・編集で共通で使用する
     // ここに固有の処理を書くのではなく、親にイベント情報を伝達させる
@@ -35,7 +36,7 @@
     private async void OnOkAsync()
     {
         // 親コンポーネント側のメソッドを呼び出す
-        await this.OnOk.InvokeAsync(this.newStockItem);        
+        await this.OnOk.InvokeAsync(this.stockItem);        
     }
 
     private async void OnCancelAsync()
