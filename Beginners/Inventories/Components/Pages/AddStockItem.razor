@@ -3,7 +3,7 @@
 @using Inventories.Data
 @using Inventories.Models
 @using Microsoft.EntityFrameworkCore
-@inject IDbContextFactory<InventoryDbContext> DbContextFactory
+@inject InventoryService InventoryService
 @inject NavigationManager NavigationManager
 
 <h3>在庫品　追加</h3>
@@ -19,9 +19,7 @@
     /// <returns></returns>
     private async Task OnOkAsync(StockItems newStockItem)
     {
-        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-        await dbContext.StockItems.AddAsync(newStockItem);
-        await dbContext.SaveChangesAsync();
+        await this.InventoryService.AddAsync(newStockItem);
 
         /// 在庫を追加した後、在庫一覧画面に戻る処理は、NavigationManagerをDIして実現する
         this.NavigationManager.NavigateTo("./inventory");

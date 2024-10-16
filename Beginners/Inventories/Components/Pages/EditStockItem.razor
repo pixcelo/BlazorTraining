@@ -3,7 +3,7 @@
 @using Inventories.Data
 @using Inventories.Models
 @using Microsoft.EntityFrameworkCore
-@inject IDbContextFactory<InventoryDbContext> DbContextFactory
+@inject InventoryService InventoryService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
@@ -33,19 +33,15 @@
     /// </summary>
     /// <returns></returns>
     protected override async Task OnInitializedAsync()
-    {
-        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-        this.stockItem = await dbContext.StockItems.FindAsync(this.Id);
+    {        
+        this.stockItem = await this.InventoryService.GetAsync(this.Id);
     }
 
     private async Task OnOkAsync(StockItems newStockItem)
     {
         try
         {
-            await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-            dbContext.StockItems.Update(newStockItem);
-            await dbContext.SaveChangesAsync();
-
+            await this.InventoryService.UpdateAsync(newStockItem);
             this.NavigationManager.NavigateTo("./inventory");
         }    
         catch (DbUpdateConcurrencyException ex)

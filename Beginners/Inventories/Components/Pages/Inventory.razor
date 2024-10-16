@@ -3,7 +3,7 @@
 @using Inventories.Data
 @using Inventories.Models
 @using Microsoft.EntityFrameworkCore
-@inject IDbContextFactory<InventoryDbContext> DbContextFactory
+@inject InventoryService InventoryService
 @inject IJSRuntime JSRuntime
 
 <h3>在庫品　一覧</h3>
@@ -32,7 +32,7 @@
 </div>
 
 @code {
-    private List<StockItems> stockItems = new List<StockItems>();
+    private IEnumerable<StockItems> stockItems = Enumerable.Empty<StockItems>();
 
     /// <summary>
     /// 初期化処理
@@ -42,9 +42,8 @@
     /// OnInitializedAsyncをオーバーライドして、ページが初期化されるときにDIしたコンテキストを使ってデータを取得
     /// </remarks>
     protected override async Task OnInitializedAsync()
-    {
-        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-        this.stockItems = await dbContext.StockItems.ToListAsync();
+    {        
+        await this.RefreshStockItems();
     }    
 
     /// <summary>
@@ -56,9 +55,16 @@
         var yes = await this.JSRuntime.InvokeAsync<bool>("confirm", $"{stockItem.Name}を削除しますか？");
         if (!yes) return;
 
-        await using var dbContext = await this.DbContextFactory.CreateDbContextAsync();
-        dbContext.Remove(stockItem);
-        await dbContext.SaveChangesAsync();
-        this.stockItems.Remove(stockItem);
+        await this.InventoryService.DeleteAsync(stockItem);
+        await this.RefreshStockItems();
+    }
+
+    /// <summary>
+    /// 在庫情報を更新する
+    /// </summary>
+    /// <returns></returns>
+    private async ValueTask RefreshStockItems()
+    {
+        this.stockItems = await this.InventoryService.GetSAllAsync();
     }
 }
