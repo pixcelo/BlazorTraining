@@ -8,6 +8,8 @@ namespace Inventories.Services
     {
         private readonly IDbContextFactory<InventoryDbContext> dbContextFactory;
 
+        public event EventHandler? Changed;
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -49,6 +51,7 @@ namespace Inventories.Services
             await using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
             await dbContext.StockItems.AddAsync(stockItem);
             await dbContext.SaveChangesAsync();
+            this.Changed?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -61,6 +64,7 @@ namespace Inventories.Services
             await using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
             dbContext.StockItems.Update(stockItem);
             await dbContext.SaveChangesAsync();
+            this.Changed?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -73,6 +77,7 @@ namespace Inventories.Services
             await using var dbContext = await this.dbContextFactory.CreateDbContextAsync();
             dbContext.StockItems.Remove(stockItem);
             await dbContext.SaveChangesAsync();
+            this.Changed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

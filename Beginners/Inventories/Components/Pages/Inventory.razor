@@ -3,8 +3,10 @@
 @using Inventories.Data
 @using Inventories.Models
 @using Microsoft.EntityFrameworkCore
+@implements IDisposable
 @inject InventoryService InventoryService
 @inject IJSRuntime JSRuntime
+@inject ILogger<Inventory> Logger
 
 <h3>在庫品　一覧</h3>
 
@@ -42,9 +44,31 @@
     /// OnInitializedAsyncをオーバーライドして、ページが初期化されるときにDIしたコンテキストを使ってデータを取得
     /// </remarks>
     protected override async Task OnInitializedAsync()
-    {        
+    {
+        this.InventoryService.Changed += this.DataService_Changed;
         await this.RefreshStockItems();
-    }    
+    }
+
+    /// <summary>
+    /// データの変更を検知して画面を更新する
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void DataService_Changed(object sender, EventArgs e)
+    {
+        try
+        {
+            await this.RefreshStockItems();
+
+            // 変更があったことをBlazor側に明示的に通知して画面を更新させる
+            // メインスレッドで実行されるようにInvokeAsyncを使用
+            await this.InvokeAsync(() => this.StateHasChanged());
+        }
+        catch (Exception ex)
+        {
+            this.Logger.LogError(ex, ex.Message);
+        }
+    }
 
     /// <summary>
     /// 在庫品を削除する（物理削除）
@@ -55,8 +79,7 @@
         var yes = await this.JSRuntime.InvokeAsync<bool>("confirm", $"{stockItem.Name}を削除しますか？");
         if (!yes) return;
 
-        await this.InventoryService.DeleteAsync(stockItem);
-        await this.RefreshStockItems();
+        await this.InventoryService.DeleteAsync(stockItem);        
     }
 
     /// <summary>
@@ -66,5 +89,10 @@
     private async ValueTask RefreshStockItems()
     {
         this.stockItems = await this.InventoryService.GetSAllAsync();
+    }
+
+    public void Dispose()
+    {
+        this.InventoryService.Changed -= this.DataService_Changed;
     }
 }
