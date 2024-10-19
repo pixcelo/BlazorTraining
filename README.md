@@ -45,3 +45,21 @@ Blazor備え付けのフォームコンポーネント
 ASP.NET Core Blazor フォームの検証
 - [DataAnnotationsValidator クラス](https://learn.microsoft.com/ja-jp/dotnet/api/microsoft.aspnetcore.components.forms.dataannotationsvalidator?view=aspnetcore-8.0)
 - [ValidationSummary クラス](https://learn.microsoft.com/ja-jp/dotnet/api/microsoft.aspnetcore.components.forms.validationsummary?view=aspnetcore-8.0)
+
+
+EF CoreでSQLスクリプトを生成
+`-Idempotent`　※冪等性　のオプションを付与すると、何度実行しても同じ状態（DBを壊さない）スクリプトを出力する
+```bash
+$ Script-Migration -Idempotent
+```
+
+## オンプレミスでのIISデプロイ
+Windows11 
+
+Windowsの機能→以下を有効化
+- インターネットインフォメーションサービス
+- アプリケーション開発機能の中の、WebSocketプロトコル
+
+.net runtime download等で検索して、hosting bundleのインストール
+
+Blazorはアプリ一つにつき、一つのアプリケーションプールが必要となる
